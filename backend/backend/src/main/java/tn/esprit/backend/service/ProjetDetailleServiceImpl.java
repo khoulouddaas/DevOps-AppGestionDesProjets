@@ -1,4 +1,4 @@
-package tn.esprit.backend.service.impl;
+package tn.esprit.backend.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
