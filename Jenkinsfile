@@ -23,7 +23,7 @@ pipeline {
         stage('Test Backend') {
             steps {
                 dir('backend') {
-                    sh 'mvn test -Dtest=!BackendApplicationTests'
+                    sh 'mvn test'
                 }
             }
             post {
