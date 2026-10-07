@@ -12,6 +12,17 @@ spec:
       labels:
         app: backend
     spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: mysql:8.0
+          command:
+            - sh
+            - -c
+            - |
+              until mysqladmin ping -h mysql -P 3306 -u root -proot --silent; do
+                echo "Waiting for MySQL..."
+                sleep 3
+              done
       containers:
         - name: backend
           image: khouloud04/devops-backend:latest
