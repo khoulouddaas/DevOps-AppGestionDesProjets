@@ -70,6 +70,14 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/'
+                sh 'kubectl rollout status deployment/backend --timeout=120s'
+                sh 'kubectl rollout status deployment/frontend --timeout=120s'
+            }
+        }
     }
 
     post {
