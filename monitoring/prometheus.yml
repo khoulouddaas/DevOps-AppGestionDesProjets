@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs:
+  # Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Tier 1 : VM hôte (Node Exporter)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Tier 2 : Jenkins (plugin Prometheus) — Jenkins tourne sur l'hôte, pas dans Docker
+  - job_name: 'jenkins'
+    metrics_path: '/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+    # Si Jenkins répond 403, décommente et mets ton user + API token Jenkins :
+    # basic_auth:
+    #   username: 'ton-user-jenkins'
+    #   password: 'ton-api-token'
+
+  # Tier 3 : Spring Boot (Actuator + Micrometer)
+  - job_name: 'spring-backend'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['backend:8080']

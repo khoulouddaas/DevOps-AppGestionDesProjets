@@ -1,0 +1,35 @@
+groups:
+  - name: devops-alerts
+    rules:
+      # VM hôte : CPU > 80% pendant 2 minutes
+      - alert: HostHighCpuUsage
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+          tier: vm-hote
+        annotations:
+          summary: "CPU élevé sur la VM hôte"
+          description: "Utilisation CPU supérieure à 80% depuis plus de 2 minutes."
+
+      # Jenkins : plus aucun exécuteur disponible pendant 5 minutes
+      - alert: JenkinsNoExecutorAvailable
+        expr: default_jenkins_executors_available == 0
+        for: 5m
+        labels:
+          severity: critical
+          tier: jenkins
+        annotations:
+          summary: "Jenkins : aucun exécuteur disponible"
+          description: "Available executors = 0 depuis plus de 5 minutes."
+
+      # Spring Boot : taux d'erreurs HTTP 5xx > 5% sur 5 minutes
+      - alert: SpringBootHighHttp5xxRate
+        expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count[5m])) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+          tier: spring-boot
+        annotations:
+          summary: "Spring Boot : taux d'erreurs 5xx élevé"
+          description: "Plus de 5% des requêtes HTTP renvoient une erreur 5xx sur 5 minutes."
